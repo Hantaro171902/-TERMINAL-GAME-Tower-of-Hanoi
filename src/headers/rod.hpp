@@ -1,25 +1,33 @@
 #pragma once
 
 #include <string>
-#include <vector>
 
-class Rod {
-private:
-    int _height = 1;
-    std::string _rodBase;
-    std::string _label;
+namespace HanoiTower {
+    namespace GameElements {
+        class Rod {
+        private:
+            int _height = 1;
+            std::string _rodBase;
+            std::string _label;
 
-    std::string createRodBase();
+        public:
+            // Constructor
+            Rod(int noDisks, int index);
 
-public:
-    Rod(int noDisks, int index);
+            // Getter & Setter for Height
+            int Height() const;
+            void Height(int value);
 
-    int getHeight() const { return _height; }
-    void setHeight(int value) { _height = value; }
+            // Getter & Setter for Label
+            std::string Label() const;
+            void Label(const std::string& value);
 
-    std::string getLabel() const { return _label; }
-    void setLabel(std::string value) { _label = value; }
+            // Getter & Setter for RodBase
+            std::string RodBase() const;
+            void RodBase(const std::string& value);
 
-    std::string getRodBase() const { return _rodBase; }
-    void setRodBase(std::string value) { _rodBase = value; }
-};
+        private:
+            std::string createRodBase();
+        };
+    }
+}
