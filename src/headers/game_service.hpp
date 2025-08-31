@@ -4,11 +4,16 @@
 #include <string>
 #include <vector>
 
+#include <iostream>
+#include <stack>
+#include <vector>
+#include <string>
+
 namespace HanoiTower {
     namespace Services {
         class GameService {
         public:
-            static void PrintRods(std::stack<int> stack1, std::stack<int> stack2, std::stack<int> stack3, int noDisks);
+            static void PrintRods(std::stack<int> stack1, std::stack<int> stack2, std::stack<int> stack3, int noDisks, int highlightIndex = -1);
             static void ClearPartOfConsole(int rowIndex);
             static int SubMenu();
             static int SubMenuLoop();

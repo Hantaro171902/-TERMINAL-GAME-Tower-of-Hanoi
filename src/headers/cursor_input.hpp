@@ -23,11 +23,11 @@ enum class InputKey {
 };
 
 // Play sound effects
-enum SoundEffect {
-    CLICK,
-    VICTORY,
-    DEFEAT
-};
+// enum SoundEffect {
+//     CLICK,
+//     VICTORY,
+//     DEFEAT
+// };
 
-void playSound(SoundEffect effect);
+// void playSound(SoundEffect effect);
 InputKey getInputKey();

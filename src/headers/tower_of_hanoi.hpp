@@ -4,6 +4,7 @@
 #include <stack>
 #include <string>
 #include <vector>
+#include <map>
 
 namespace HanoiTower {
 
@@ -24,11 +25,11 @@ namespace HanoiTower {
         static void UserPlay(std::array<std::stack<int>, 3>& rods);
 
         // Computer flow
-        static void ComputerPlay(int n, std::stack<int>& source, std::stack<int>& auxiliary, std::stack<int>& destination);
+        static void ComputerPlay(std::array<std::stack<int>, 3>& rods);
 
         // Automatic solver & helpers
-        static void SolveAutomatically(int n, std::stack<int>& source, std::stack<int>& auxiliary, std::stack<int>& destination);
-        static void MoveDisk(std::stack<int>& source, std::stack<int>& destination, int s1, int s2);
+        static void SolveAutomatically(int n, std::stack<int>& source, std::stack<int>& destination, std::stack<int>& auxiliary, int& noSteps, std::array<std::stack<int>, 3>& rods);
+        static void moveDiskWithPrint(std::stack<int>& source, std::stack<int>& destination, int& noSteps, std::array<std::stack<int>, 3>& rods);
     };
 
 } // namespace HanoiTower

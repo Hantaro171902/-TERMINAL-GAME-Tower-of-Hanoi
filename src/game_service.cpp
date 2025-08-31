@@ -31,7 +31,7 @@ namespace HanoiTower {
             return v;
         }
 
-        void GameService::PrintRods(stack<int> stack1, stack<int> stack2, stack<int> stack3, int noDisks) {
+        void GameService::PrintRods(stack<int> stack1, stack<int> stack2, stack<int> stack3, int noDisks, int highlightIndex) {
             using namespace HanoiTower::GameElements;
 
             Rod rod1(noDisks, 0);
@@ -81,13 +81,24 @@ namespace HanoiTower {
 
             // Print rod bases
             cout << rod1.RodBase() << DesignCharConstants::SpaceBetweenTowers
-                      << rod2.RodBase() << DesignCharConstants::SpaceBetweenTowers
-                      << rod3.RodBase() << endl;
+                 << rod2.RodBase() << DesignCharConstants::SpaceBetweenTowers
+                 << rod3.RodBase() << endl;
 
             // Print rod labels (rough alignment)
-            cout << rod1.Label() << DesignCharConstants::SpaceBetweenTowers
-                      << rod2.Label() << DesignCharConstants::SpaceBetweenTowers
-                      << rod3.Label() << endl;
+            if (highlightIndex == 0) setTextColor(TextColor::YELLOW);
+            cout << rod1.Label();
+            if (highlightIndex == 0) resetTextColor();
+            cout << DesignCharConstants::SpaceBetweenTowers;
+
+            if (highlightIndex == 1) setTextColor(TextColor::YELLOW);
+            cout << rod2.Label();
+            if (highlightIndex == 1) resetTextColor();
+            cout << DesignCharConstants::SpaceBetweenTowers;
+
+            if (highlightIndex == 2) setTextColor(TextColor::YELLOW);
+            cout << rod3.Label();
+            if (highlightIndex == 2) resetTextColor();
+            cout << endl;
         }
 
         void GameService::ClearPartOfConsole(int rowIndex) {

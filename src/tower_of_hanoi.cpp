@@ -4,6 +4,7 @@
 #include "design_char_constants.hpp"
 #include "utils.hpp"
 #include "color.hpp"
+#include "cursor_input.hpp"
 
 #include <iostream>
 #include <cmath>
@@ -11,6 +12,8 @@
 #include <array>
 #include <vector>
 #include <string>
+#include <limits>
+#include <map>
 
 using namespace std;
 
@@ -37,7 +40,7 @@ namespace HanoiTower {
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             cout << "Invalid input! Please enter a positive integer.\n";
         }
-
+        
         TheGame();
     }
 
@@ -53,20 +56,13 @@ namespace HanoiTower {
         rods[1] = stack<int>();
         rods[2] = stack<int>();
 
-        // Initial state
-        Services::GameService::PrintRods(rods[0], rods[1], rods[2], noDisks);
-
         // Mode selection
         int mode = Services::GameService::SubMenu();
-
-        clearScreen();
-        Services::GameService::PrintHeader();
-        Services::GameService::PrintRods(rods[0], rods[1], rods[2], noDisks);
 
         if (mode == 0) {
             UserPlay(rods);
         } else {
-            ComputerPlay(noDisks, rods[0], rods[1], rods[2]);
+            ComputerPlay(rods);
         }
 
         // Replay loop
@@ -79,137 +75,154 @@ namespace HanoiTower {
             exit(0);
         }
     }
-
+    
     // ------------------- User Play -------------------
     void TowerOfHanoi::UserPlay(array<stack<int>, 3>& rods) {
         int noSteps = 0;
+        int selectedRodIndex = 0;
+        int fromRodIndex = -1;
 
         while (true) {
-            char fromTower, toTower;
+            clearScreen();
+            Services::GameService::PrintHeader();
+
+            // Highlight the selected rod
+            Services::GameService::PrintRods(rods[0], rods[1], rods[2], noDisks, selectedRodIndex);
 
             cout << GameElements::DesignCharConstants::LineBreak << "\n";
             cout << "# " << noSteps << "\t No.Disks: " << noDisks << "\n\n";
 
-            cout << "> Move disk from tower (A/B/C or 'exit'): ";
-            cin >> fromTower;
-            if (tolower(fromTower) == 'e') break;
-
-            cout << "> Move disk to tower (A/B/C or 'exit'): ";
-            cin >> toTower;
-            if (tolower(toTower) == 'e') break;
-
-            moves.push_back(string(1, fromTower) + " -> " + string(1, toTower));
-
-            int in1 = Services::GameService::ReturnLabelIndex(fromTower);
-            int in2 = Services::GameService::ReturnLabelIndex(toTower);
-
-            clearScreen();
-            Services::GameService::PrintHeader();
-
-            string error;
-            if (in1 == -1 || in2 == -1) {
-                error = "!!! Invalid tower label !!!";
-            }
-            else if (in1 == in2) {
-                error = "!!! Source and destination towers must be different !!!";
-            }
-            else if (rods[in1].empty()) {
-                error = "!!! Source tower is empty !!!";
-            }
-            else {
-                int topDisk = rods[in1].top();
-                if (rods[in2].empty() || rods[in2].top() > topDisk) {
-                    rods[in1].pop();
-                    rods[in2].push(topDisk);
-                } else {
-                    error = "!!! Cannot place bigger disk on smaller one !!!";
-                }
+            if (fromRodIndex == -1) {
+                cout << "> Select a source tower using LEFT/RIGHT arrows. Press ENTER to select.\n";
+            } else {
+                cout << "> Move disk from tower " << fromRodIndex + 1 << ". Select a destination tower.\n";
             }
 
-            // Print rods
-            Services::GameService::PrintRods(rods[0], rods[1], rods[2], noDisks);
-
-            if (!error.empty()) {
-                cout << GameElements::DesignCharConstants::LineBreak << "\n" << error << "\n";
-                moves.push_back(error);
+            InputKey k = getInputKey();
+            
+            switch (k) {
+                case InputKey::LEFT:
+                    selectedRodIndex = (selectedRodIndex - 1 + 3) % 3;
+                    break;
+                case InputKey::RIGHT:
+                    selectedRodIndex = (selectedRodIndex + 1) % 3;
+                    break;
+                case InputKey::ENTER:
+                    if (fromRodIndex == -1) {
+                        fromRodIndex = selectedRodIndex;
+                    } else {
+                        int toRodIndex = selectedRodIndex;
+                        string error;
+                        
+                        if (fromRodIndex == toRodIndex) {
+                            error = "!!! Source and destination towers must be different !!!";
+                        } else if (rods[fromRodIndex].empty()) {
+                            error = "!!! Source tower is empty !!!";
+                        } else {
+                            int topDisk = rods[fromRodIndex].top();
+                            if (rods[toRodIndex].empty() || rods[toRodIndex].top() > topDisk) {
+                                rods[fromRodIndex].pop();
+                                rods[toRodIndex].push(topDisk);
+                                noSteps++;
+                                moves.push_back(to_string(fromRodIndex + 1) + " -> " + to_string(toRodIndex + 1));
+                            } else {
+                                error = "!!! Cannot place a larger disk on a smaller one !!!";
+                            }
+                        }
+                        
+                        fromRodIndex = -1; // Reset for next move
+                        
+                        if (!error.empty()) {
+                            cout << GameElements::DesignCharConstants::LineBreak << "\n" << error << "\n";
+                            sleep_ms(2000); // Pause to show error message
+                        }
+                    }
+                    break;
+                case InputKey::Q:
+                case InputKey::ESC:
+                    cout << "Exiting game...\n";
+                    return;
+                default:
+                    break;
             }
-
-            noSteps++;
 
             // Win check
             if ((int)rods[2].size() == noDisks) {
+                clearScreen();
+                Services::GameService::PrintHeader();
+                Services::GameService::PrintRods(rods[0], rods[1], rods[2], noDisks);
                 cout << GameElements::DesignCharConstants::LineBreak << "\n";
                 cout << "# " << noSteps << "\t No.Disks: " << noDisks << "\n";
                 Services::GameService::YouWonText("Y O U");
                 Services::LogService::ToFileShort(moves, "User", noDisks, noSteps);
+                sleep_ms(3000);
                 break;
             }
         }
     }
 
-    // ------------------- Computer Play -------------------
-    void TowerOfHanoi::ComputerPlay(int n, stack<int>& source, stack<int>& auxiliary, stack<int>& destination) {
-        if (noDisks % 2 == 0) {
-            SolveAutomatically(noDisks, source, destination, auxiliary);
-        } else {
-            SolveAutomatically(noDisks, source, auxiliary, destination);
-        }
-    }
 
-    void TowerOfHanoi::SolveAutomatically(int n, stack<int>& source, stack<int>& auxiliary, stack<int>& destination) {
-        int noSteps = 1;
+    // ------------------- Computer Play -------------------
+    void TowerOfHanoi::ComputerPlay(array<stack<int>, 3>& rods) {
+        clearScreen();
+        Services::GameService::PrintHeader();
+        Services::GameService::PrintRods(rods[0], rods[1], rods[2], noDisks);
+
         cout << GameElements::DesignCharConstants::LineBreak << "\n";
         cout << "# 0\t No.Disks: " << noDisks << "\n";
-        sleep_ms(1000);
+        cout << "The computer will now play the game automatically.\n";
+        sleep_ms(3000);
 
-        int step1 = 0, step2 = 0;
-        int totalMoves = (int)pow(2, n) - 1;
-
-        for (int i = 1; i <= totalMoves; ++i) {
-            if (i % 3 == 1) {
-                if (noDisks % 2 == 0) { step1 = 1; step2 = 2; }
-                else { step1 = 1; step2 = 3; }
-                MoveDisk(source, destination, step1, step2);
-            }
-            else if (i % 3 == 2) {
-                if (noDisks % 2 == 0) { step1 = 1; step2 = 3; }
-                else { step1 = 1; step2 = 2; }
-                MoveDisk(source, auxiliary, step1, step2);
-            }
-            else {
-                if (noDisks % 2 == 0) { step1 = 2; step2 = 3; }
-                else { step1 = 3; step2 = 2; }
-                MoveDisk(destination, auxiliary, step1, step2);
-            }
-
-            Services::GameService::ClearPartOfConsole(4);
-
-            if (noDisks % 2 == 0)
-                Services::GameService::PrintRods(source, destination, auxiliary, noDisks);
-            else
-                Services::GameService::PrintRods(source, auxiliary, destination, noDisks);
-
-            cout << GameElements::DesignCharConstants::LineBreak << "\n";
-            cout << "# " << noSteps++ << "\t No.Disks: " << noDisks << "\n";
-            sleep_ms(1000);
-        }
-
+        int noSteps = 0;
+        SolveAutomatically(noDisks, rods[0], rods[2], rods[1], noSteps, rods);
+        
         Services::GameService::YouWonText("T H E   C O M P U T E R");
-        Services::LogService::ToFileShort(moves, "Computer", noDisks, noSteps - 1);
+        Services::LogService::ToFileShort(moves, "Computer", noDisks, noSteps);
+        sleep_ms(3000);
+    }
+    
+    // ------------------- Recursive Solution -------------------
+    void TowerOfHanoi::SolveAutomatically(int n, stack<int>& source, stack<int>& destination, stack<int>& auxiliary, int& noSteps, array<stack<int>, 3>& rods) {
+        if (n > 0) {
+            SolveAutomatically(n - 1, source, auxiliary, destination, noSteps, rods);
+
+            moveDiskWithPrint(source, destination, noSteps, rods);
+            
+            SolveAutomatically(n - 1, auxiliary, destination, source, noSteps, rods);
+        }
     }
 
-    // ------------------- Move Disk -------------------
-    void TowerOfHanoi::MoveDisk(stack<int>& source, stack<int>& destination, int s1, int s2) {
-        if (!source.empty() && (destination.empty() || destination.top() > source.top())) {
-            int disk = source.top(); source.pop();
-            destination.push(disk);
-            moves.push_back(to_string(s1) + " -> " + to_string(s2));
+    // ------------------- Move Disk with Print -------------------
+    void TowerOfHanoi::moveDiskWithPrint(stack<int>& source, stack<int>& destination, int& noSteps, array<stack<int>, 3>& rods) {
+        if (source.empty()) {
+            return;
         }
-        else if (!destination.empty() && (source.empty() || source.top() > destination.top())) {
-            int disk = destination.top(); destination.pop();
-            source.push(disk);
-            moves.push_back(to_string(s2) + " -> " + to_string(s1));
-        }
+
+        int disk = source.top(); source.pop();
+        destination.push(disk);
+
+        noSteps++;
+        
+        clearScreen();
+        Services::GameService::PrintHeader();
+        Services::GameService::PrintRods(rods[0], rods[1], rods[2], noDisks);
+        
+        // Find the correct labels for the moved disk based on the original rod positions.
+        char sourceLabel = ' ';
+        char destLabel = ' ';
+        if (&source == &rods[0]) sourceLabel = GameElements::DesignCharConstants::RodLabels[0];
+        else if (&source == &rods[1]) sourceLabel = GameElements::DesignCharConstants::RodLabels[1];
+        else if (&source == &rods[2]) sourceLabel = GameElements::DesignCharConstants::RodLabels[2];
+
+        if (&destination == &rods[0]) destLabel = GameElements::DesignCharConstants::RodLabels[0];
+        else if (&destination == &rods[1]) destLabel = GameElements::DesignCharConstants::RodLabels[1];
+        else if (&destination == &rods[2]) destLabel = GameElements::DesignCharConstants::RodLabels[2];
+
+        moves.push_back("Move disk " + to_string(disk) + " from " + string(1, sourceLabel) + " to " + string(1, destLabel));
+
+        cout << GameElements::DesignCharConstants::LineBreak << "\n";
+        cout << "# " << noSteps << "\t No.Disks: " << noDisks << "\n";
+        sleep_ms(500); // 500ms delay to make the moves visible
     }
 
 } // namespace HanoiTower
