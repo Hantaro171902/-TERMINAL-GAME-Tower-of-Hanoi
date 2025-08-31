@@ -134,8 +134,8 @@ namespace HanoiTower {
         }
 
         void GameService::YouWonText(const string& role) {
-            cout << DesignCharConstants::LineBreak << endl << endl;
-            cout << "> > > !!! " << role << "   W O N !!! < < <" << endl << endl;
+            cout << DesignCharConstants::LineBreak << endl << endl << flush;
+            cout << "> > > !!! " << role << "   W O N !!! < < <" << endl << endl << flush;
         }
 
         void GameService::PrintHeader() {
@@ -153,14 +153,14 @@ namespace HanoiTower {
             while (true) {
                 clearScreen();                     // redraw from scratch (simple + reliable)
                 PrintHeader();
-                cout << "\n\n> Please choose who do you want to play the game:\n\n";
+                cout << "\n\n> Please choose who do you want to play the game:\n\n" << flush;
 
                 for (size_t i = 0; i < items.size(); ++i) {
                     if ((int)i == selected) {
                         // highlight selection with arrow and optional color
-                        cout << "  > " << items[i] << "\n";
+                        cout << "  > " << items[i] << "\n" << flush;
                     } else {
-                        cout << "    " << items[i] << "\n";
+                        cout << "    " << items[i] << "\n" << flush;
                     }
                 }
 
@@ -194,7 +194,7 @@ namespace HanoiTower {
             while (true) {
                 clearScreen();
                 PrintHeader();
-                cout << "\n";
+                cout << endl;
                 for (size_t i = 0; i < items.size(); ++i) {
                     if ((int)i == selected) cout << "  > " << items[i] << "\n";
                     else cout << "    " << items[i] << "\n";
@@ -221,11 +221,11 @@ namespace HanoiTower {
         }
 
         void GameService::ClearCurrentConsoleLine() {
-            cout << "\r" << string(120, ' ') << "\r";
+            cout << "\r" << string(120, ' ') << "\r" << flush;
         }
 
         void GameService::ClearToEndOfCurrentLine() {
-            cout << string(80, ' ');
+            cout << string(80, ' ') << flush;
         }
     }
 }

@@ -25,12 +25,13 @@ namespace HanoiTower {
 
     // ------------------- Play -------------------
     void TowerOfHanoi::Play() {
+        clearTerminal();
         clearScreen();
         Services::GameService::PrintHeader();
 
         // Ask user for number of disks
         while (true) {
-            cout << "> Enter the number of disks: ";
+            cout << "> Enter the number of disks: " << flush;
             cin >> noDisks;
 
             if (!cin.fail() && noDisks > 0) break;
@@ -38,7 +39,7 @@ namespace HanoiTower {
             // Reset bad input
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Invalid input! Please enter a positive integer.\n";
+            cout << "Invalid input! Please enter a positive integer.\n" << flush;
         }
         
         TheGame();
@@ -46,7 +47,6 @@ namespace HanoiTower {
 
     // ------------------- The Game -------------------
     void TowerOfHanoi::TheGame() {
-        clearScreen();
         moves.clear();
         Services::GameService::PrintHeader();
 
@@ -70,8 +70,8 @@ namespace HanoiTower {
         if (playAgain == 0) {
             Play(); // restart
         } else {
-            clearScreen();
-            cout << "Thanks for playing!\n";
+            // clearScreen();
+            cout << "Thanks for playing!\n" << flush;
             exit(0);
         }
     }
@@ -83,19 +83,15 @@ namespace HanoiTower {
         int fromRodIndex = -1;
 
         while (true) {
-            clearScreen();
             Services::GameService::PrintHeader();
-
-            // Highlight the selected rod
             Services::GameService::PrintRods(rods[0], rods[1], rods[2], noDisks, selectedRodIndex);
-
-            cout << GameElements::DesignCharConstants::LineBreak << "\n";
-            cout << "# " << noSteps << "\t No.Disks: " << noDisks << "\n\n";
+            cout << GameElements::DesignCharConstants::LineBreak << "\n" << flush;
+            cout << "# " << noSteps << "\t No.Disks: " << noDisks << "\n\n" << flush;
 
             if (fromRodIndex == -1) {
-                cout << "> Select a source tower using LEFT/RIGHT arrows. Press ENTER to select.\n";
+                cout << "> Select a source tower using LEFT/RIGHT arrows. Press ENTER to select.\n" << flush;
             } else {
-                cout << "> Move disk from tower " << fromRodIndex + 1 << ". Select a destination tower.\n";
+                cout << "> Move disk from tower " << (fromRodIndex + 1) << ". Select a destination tower. Press ENTER to confirm.\n" << flush;
             }
 
             InputKey k = getInputKey();
@@ -125,22 +121,21 @@ namespace HanoiTower {
                                 rods[toRodIndex].push(topDisk);
                                 noSteps++;
                                 moves.push_back(to_string(fromRodIndex + 1) + " -> " + to_string(toRodIndex + 1));
+                                fromRodIndex = -1; // Reset only after successful move
                             } else {
                                 error = "!!! Cannot place a larger disk on a smaller one !!!";
                             }
                         }
                         
-                        fromRodIndex = -1; // Reset for next move
-                        
                         if (!error.empty()) {
-                            cout << GameElements::DesignCharConstants::LineBreak << "\n" << error << "\n";
-                            sleep_ms(2000); // Pause to show error message
+                            cout << GameElements::DesignCharConstants::LineBreak << "\n" << error << "\n" << flush;
+                            sleep_ms(2000);
                         }
                     }
                     break;
                 case InputKey::Q:
                 case InputKey::ESC:
-                    cout << "Exiting game...\n";
+                    cout << "Exiting game...\n" << flush;
                     return;
                 default:
                     break;
@@ -148,11 +143,10 @@ namespace HanoiTower {
 
             // Win check
             if ((int)rods[2].size() == noDisks) {
-                clearScreen();
                 Services::GameService::PrintHeader();
                 Services::GameService::PrintRods(rods[0], rods[1], rods[2], noDisks);
-                cout << GameElements::DesignCharConstants::LineBreak << "\n";
-                cout << "# " << noSteps << "\t No.Disks: " << noDisks << "\n";
+                cout << GameElements::DesignCharConstants::LineBreak << "\n" << flush;
+                cout << "# " << noSteps << "\t No.Disks: " << noDisks << "\n" << flush;
                 Services::GameService::YouWonText("Y O U");
                 Services::LogService::ToFileShort(moves, "User", noDisks, noSteps);
                 sleep_ms(3000);
@@ -164,13 +158,12 @@ namespace HanoiTower {
 
     // ------------------- Computer Play -------------------
     void TowerOfHanoi::ComputerPlay(array<stack<int>, 3>& rods) {
-        clearScreen();
         Services::GameService::PrintHeader();
         Services::GameService::PrintRods(rods[0], rods[1], rods[2], noDisks);
 
-        cout << GameElements::DesignCharConstants::LineBreak << "\n";
-        cout << "# 0\t No.Disks: " << noDisks << "\n";
-        cout << "The computer will now play the game automatically.\n";
+        cout << GameElements::DesignCharConstants::LineBreak << "\n" << flush;
+        cout << "# 0\t No.Disks: " << noDisks << "\n" << flush;
+        cout << "The computer will now play the game automatically.\n" << flush;
         sleep_ms(3000);
 
         int noSteps = 0;
@@ -203,7 +196,6 @@ namespace HanoiTower {
 
         noSteps++;
         
-        clearScreen();
         Services::GameService::PrintHeader();
         Services::GameService::PrintRods(rods[0], rods[1], rods[2], noDisks);
         
@@ -220,8 +212,8 @@ namespace HanoiTower {
 
         moves.push_back("Move disk " + to_string(disk) + " from " + string(1, sourceLabel) + " to " + string(1, destLabel));
 
-        cout << GameElements::DesignCharConstants::LineBreak << "\n";
-        cout << "# " << noSteps << "\t No.Disks: " << noDisks << "\n";
+        cout << GameElements::DesignCharConstants::LineBreak << "\n" << flush;
+        cout << "# " << noSteps << "\t No.Disks: " << noDisks << "\n" << flush;
         sleep_ms(500); // 500ms delay to make the moves visible
     }
 
