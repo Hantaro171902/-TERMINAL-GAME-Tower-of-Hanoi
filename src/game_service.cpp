@@ -4,17 +4,18 @@
 #include "design_char_constants.hpp"
 #include "utils.hpp"
 #include "color.hpp"
+#include "cursor_input.hpp"
 
 #include <iostream>
 #include <stack>
 #include <vector>
 #include <algorithm>
-#include <conio.h>   // for _getch() on Windows
 #ifdef _WIN32
 #include <windows.h>
 #endif
 
 using namespace std;
+using namespace HanoiTower::GameElements;
 
 namespace HanoiTower {
     namespace Services {
@@ -135,46 +136,77 @@ namespace HanoiTower {
 
         // TODO: SubMenu & SubMenuLoop → will require arrow key reading (_getch)
         int GameService::SubMenu() {
-            cout << "\n\n> Please choose who do you want to play the game:\n";
-            vector<string> items = { "○ The user", "○ The computer" };
-            int selectedItemIndex = 0;
-            int cursorY = 5; // You’d track where you started printing
+            const vector<string> items = { "The user", "The computer" };
+            int selected = 0;
 
             while (true) {
-                move_cursor(0, cursorY);
+                clearScreen();                     // redraw from scratch (simple + reliable)
+                PrintHeader();
+                cout << "\n\n> Please choose who do you want to play the game:\n\n";
 
-                // Print menu
-                for (int i = 0; i < items.size(); i++) {
-                    if (i == selectedItemIndex) {
-                        setTextColor(30); // black text
-                        cout << BG_WHITE; // white background
-                        items[i].replace(0, 1, "•");
+                for (size_t i = 0; i < items.size(); ++i) {
+                    if ((int)i == selected) {
+                        // highlight selection with arrow and optional color
+                        cout << "  > " << items[i] << "\n";
                     } else {
-                        items[i].replace(0, 1, "○");
-                        setTextColor(37); // white text (default)
-                        cout << BG_BLACK; // black background
+                        cout << "    " << items[i] << "\n";
                     }
-                    cout << items[i] << endl;
-                    cout << DEFAULT; // reset
                 }
 
-                // Input handling
-                int key = getch();
-                if (key == 72) { // up arrow
-                    selectedItemIndex--;
-                    if (selectedItemIndex < 0) selectedItemIndex = items.size() - 1;
-                } else if (key == 80) { // down arrow
-                    selectedItemIndex++;
-                    if (selectedItemIndex >= items.size()) selectedItemIndex = 0;
-                } else if (key == 13) { // Enter
-                    return selectedItemIndex;
+                // Wait for input mapped to InputKey
+                InputKey k = getInputKey();
+
+                switch (k) {
+                    case InputKey::UP:
+                        selected = (selected - 1 + (int)items.size()) % (int)items.size();
+                        break;
+                    case InputKey::DOWN:
+                        selected = (selected + 1) % (int)items.size();
+                        break;
+                    case InputKey::ENTER:
+                        return selected;
+                    case InputKey::ESC:
+                    case InputKey::Q:
+                        return 0; // default to "The user" if escaped / quit
+                    default:
+                        // ignore other keys
+                        break;
                 }
+                // small pause avoided — getInputKey blocks until a key — immediate redraw
             }
         }
 
         int GameService::SubMenuLoop() {
-            cout << "Play again (stubbed)" << endl;
-            return 0;
+            const vector<string> items = { "Play again", "Exit" };
+            int selected = 0;
+
+            while (true) {
+                clearScreen();
+                PrintHeader();
+                cout << "\n";
+                for (size_t i = 0; i < items.size(); ++i) {
+                    if ((int)i == selected) cout << "  > " << items[i] << "\n";
+                    else cout << "    " << items[i] << "\n";
+                }
+
+                InputKey k = getInputKey();
+
+                switch (k) {
+                    case InputKey::UP:
+                        selected = (selected - 1 + (int)items.size()) % (int)items.size();
+                        break;
+                    case InputKey::DOWN:
+                        selected = (selected + 1) % (int)items.size();
+                        break;
+                    case InputKey::ENTER:
+                        return selected;
+                    case InputKey::ESC:
+                    case InputKey::Q:
+                        return 1; // treat ESC/Q as Exit
+                    default:
+                        break;
+                }
+            }
         }
 
         void GameService::ClearCurrentConsoleLine() {

@@ -18,6 +18,7 @@ set(SOURCES
     src/design_char_constants.cpp
     src/tower_of_hanoi.cpp
     src/color.cpp
+    src/cursor_input.cpp
 )
 
 set(HEADERS
@@ -29,6 +30,7 @@ set(HEADERS
     src/headers/design_char_constants.hpp
     src/headers/tower_of_hanoi.hpp
     src/headers/color.hpp
+    src/headers/cursor_input.hpp
 )
 
 # Exe

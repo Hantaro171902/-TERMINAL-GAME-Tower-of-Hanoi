@@ -1,5 +1,5 @@
-#include "cursor_input.h"
-#include "ultils.h"
+#include "cursor_input.hpp"
+#include "utils.hpp"
 #include <iostream>
 #include <termios.h>
 #include <unistd.h>     // for read()
