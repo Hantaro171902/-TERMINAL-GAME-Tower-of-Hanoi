@@ -2,6 +2,8 @@
 #include "disk.hpp"
 #include "rod.hpp"
 #include "design_char_constants.hpp"
+#include "utils.hpp"
+#include "color.hpp"
 
 #include <iostream>
 #include <stack>
@@ -133,9 +135,41 @@ namespace HanoiTower {
 
         // TODO: SubMenu & SubMenuLoop → will require arrow key reading (_getch)
         int GameService::SubMenu() {
-            cout << "> Please choose who do you want to play the game:" << endl;
-            cout << "   (stub: always returns 0 for now)" << endl;
-            return 0;
+            cout << "\n\n> Please choose who do you want to play the game:\n";
+            vector<string> items = { "○ The user", "○ The computer" };
+            int selectedItemIndex = 0;
+            int cursorY = 5; // You’d track where you started printing
+
+            while (true) {
+                move_cursor(0, cursorY);
+
+                // Print menu
+                for (int i = 0; i < items.size(); i++) {
+                    if (i == selectedItemIndex) {
+                        setTextColor(30); // black text
+                        cout << BG_WHITE; // white background
+                        items[i].replace(0, 1, "•");
+                    } else {
+                        items[i].replace(0, 1, "○");
+                        setTextColor(37); // white text (default)
+                        cout << BG_BLACK; // black background
+                    }
+                    cout << items[i] << endl;
+                    cout << DEFAULT; // reset
+                }
+
+                // Input handling
+                int key = getch();
+                if (key == 72) { // up arrow
+                    selectedItemIndex--;
+                    if (selectedItemIndex < 0) selectedItemIndex = items.size() - 1;
+                } else if (key == 80) { // down arrow
+                    selectedItemIndex++;
+                    if (selectedItemIndex >= items.size()) selectedItemIndex = 0;
+                } else if (key == 13) { // Enter
+                    return selectedItemIndex;
+                }
+            }
         }
 
         int GameService::SubMenuLoop() {
