@@ -1,15 +1,29 @@
 #pragma once
 
-#include "utils.hpp"
-#include "string"
+#include <string>
+#include <cmath>
 
-class Disk {
-private:
-    int _size = 1;
-    std::string _disk;
-    std::string createDisk();
+namespace HanoiTower {
+    namespace GameElements {
+        class Disk {
+        private:
+            int _size = 1;
+            std::string _disk;
 
-public:
-    std::string representation;
-    Disk(int _size);
-};
+        public:
+            // Constructor
+            Disk(int size);
+
+            // Getter & Setter for Size
+            int Size() const;
+            void Size(int value);
+
+            // Getter & Setter for Disk string
+            std::string GetDisk() const;
+            void GetDisk(const std::string& value);
+
+        private:
+            std::string createDisk();
+        };
+    }
+}
