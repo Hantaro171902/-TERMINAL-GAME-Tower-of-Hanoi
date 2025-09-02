@@ -26,7 +26,6 @@ namespace HanoiTower {
     // ------------------- Play -------------------
     void TowerOfHanoi::Play() {
         clearTerminal();
-        clearScreen();
         Services::GameService::PrintHeader();
 
         // Ask user for number of disks
@@ -83,6 +82,7 @@ namespace HanoiTower {
         int fromRodIndex = -1;
 
         while (true) {
+            clearScreen();
             Services::GameService::PrintHeader();
             Services::GameService::PrintRods(rods[0], rods[1], rods[2], noDisks, selectedRodIndex);
             cout << GameElements::DesignCharConstants::LineBreak << "\n" << flush;
@@ -143,6 +143,7 @@ namespace HanoiTower {
 
             // Win check
             if ((int)rods[2].size() == noDisks) {
+                clearScreen();
                 Services::GameService::PrintHeader();
                 Services::GameService::PrintRods(rods[0], rods[1], rods[2], noDisks);
                 cout << GameElements::DesignCharConstants::LineBreak << "\n" << flush;
@@ -158,6 +159,7 @@ namespace HanoiTower {
 
     // ------------------- Computer Play -------------------
     void TowerOfHanoi::ComputerPlay(array<stack<int>, 3>& rods) {
+        clearScreen();
         Services::GameService::PrintHeader();
         Services::GameService::PrintRods(rods[0], rods[1], rods[2], noDisks);
 
@@ -196,6 +198,7 @@ namespace HanoiTower {
 
         noSteps++;
         
+        clearScreen();
         Services::GameService::PrintHeader();
         Services::GameService::PrintRods(rods[0], rods[1], rods[2], noDisks);
         

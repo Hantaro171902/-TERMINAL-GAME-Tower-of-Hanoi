@@ -41,7 +41,8 @@ void clearScreen() {
 #ifdef _WIN32
     system("cls");
 #else
-    cout << "\033[2J\033[1;1H"; // Clear screen + move cursor to top-left
+    // Clear scrollback buffer (3J), clear screen (2J), then move cursor home (H)
+    cout << "\033[3J\033[2J\033[H";
 #endif
 }
 
@@ -49,18 +50,11 @@ void clearTerminal() {
 #ifdef _WIN32
     system("cls");
 #else
-    cout << "\033c"; // Full reset
+    // Full reset and also clear scrollback buffer for terminals that keep history
+    cout << "\033[3J\033c\033[H";
 #endif
 }
 
-void setTextColor(int color) {
-#ifdef _WIN32
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    SetConsoleTextAttribute(hConsole, color);
-#else
-    cout << "\033[" << color << "m";
-#endif
-}
 
 void move_cursor(int x, int y) {
 #ifdef _WIN32

@@ -32,7 +32,6 @@ namespace HanoiTower {
         }
 
         void GameService::PrintRods(stack<int> stack1, stack<int> stack2, stack<int> stack3, int noDisks, int highlightIndex) {
-            using namespace HanoiTower::GameElements;
 
             Rod rod1(noDisks, 0);
             Rod rod2(noDisks, 1);
@@ -42,38 +41,40 @@ namespace HanoiTower {
             vector<int> v2 = stackToVector(stack2);
             vector<int> v3 = stackToVector(stack3);
 
-            int s1 = 0, s2 = 0, s3 = 0;
+            int s1 = static_cast<int>(v1.size()) - 1;
+            int s2 = static_cast<int>(v2.size()) - 1;
+            int s3 = static_cast<int>(v3.size()) - 1;
 
             for (int i = 1; i <= noDisks; i++) {
                 string line;
 
                 // Rod 1
-                if (v1.empty() || i <= (noDisks - (int)v1.size())) {
+                if (v1.empty() || i <= (noDisks - static_cast<int>(v1.size()))) {
                     line += ConstructLine(Space(noDisks * 2), DesignCharConstants::RodChar);
                 } else {
                     Disk disk(v1[s1]);
                     line += ConstructLine(Space((noDisks * 2) - v1[s1]), disk.GetDisk());
-                    s1++;
+                    s1--;
                 }
                 line += DesignCharConstants::SpaceBetweenTowers;
 
                 // Rod 2
-                if (v2.empty() || i <= (noDisks - (int)v2.size())) {
+                if (v2.empty() || i <= (noDisks - static_cast<int>(v2.size()))) {
                     line += ConstructLine(Space(noDisks * 2), DesignCharConstants::RodChar);
                 } else {
                     Disk disk(v2[s2]);
                     line += ConstructLine(Space((noDisks * 2) - v2[s2]), disk.GetDisk());
-                    s2++;
+                    s2--;
                 }
                 line += DesignCharConstants::SpaceBetweenTowers;
 
                 // Rod 3
-                if (v3.empty() || i <= (noDisks - (int)v3.size())) {
+                if (v3.empty() || i <= (noDisks - static_cast<int>(v3.size()))) {
                     line += ConstructLine(Space(noDisks * 2), DesignCharConstants::RodChar);
                 } else {
                     Disk disk(v3[s3]);
                     line += ConstructLine(Space((noDisks * 2) - v3[s3]), disk.GetDisk());
-                    s3++;
+                    s3--;
                 }
 
                 cout << line << endl;
