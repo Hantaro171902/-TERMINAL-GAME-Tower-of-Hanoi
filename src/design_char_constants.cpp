@@ -1,4 +1,5 @@
 #include "design_char_constants.hpp"
+#include "color.hpp"
 #include <iostream>
 
 using namespace std;

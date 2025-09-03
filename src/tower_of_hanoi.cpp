@@ -26,8 +26,10 @@ namespace HanoiTower {
     // ------------------- Play -------------------
     void TowerOfHanoi::Play() {
         clearTerminal();
-        Services::GameService::PrintHeader();
+        setTextColor(RED);
 
+        Services::GameService::PrintHeader();
+        resetTextColor();
         // Ask user for number of disks
         while (true) {
             cout << "> Enter the number of disks: " << flush;
@@ -83,7 +85,9 @@ namespace HanoiTower {
 
         while (true) {
             clearScreen();
+            setTextColor(RED);
             Services::GameService::PrintHeader();
+            resetTextColor();
             Services::GameService::PrintRods(rods[0], rods[1], rods[2], noDisks, selectedRodIndex);
             cout << GameElements::DesignCharConstants::LineBreak << "\n" << flush;
             cout << "# " << noSteps << "\t No.Disks: " << noDisks << "\n\n" << flush;

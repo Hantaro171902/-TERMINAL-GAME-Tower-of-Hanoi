@@ -10,7 +10,7 @@ namespace HanoiTower {
         // Constructor
         Disk::Disk(int size) {
             if (size < 0) {
-                size = std::abs(size);
+                size = abs(size);
             } else if (size == 0) {
                 size = 1;
             }
@@ -23,12 +23,12 @@ namespace HanoiTower {
         void Disk::Size(int value) { _size = value; }
 
         // Disk getter & setter
-        std::string Disk::GetDisk() const { return _disk; }
-        void Disk::GetDisk(const std::string& value) { _disk = value; }
+        string Disk::GetDisk() const { return _disk; }
+        void Disk::GetDisk(const string& value) { _disk = value; }
 
         // Create disk ASCII representation
-        std::string Disk::createDisk() {
-            std::string peg = DesignCharConstants::DiskStartChar;
+        string Disk::createDisk() {
+            string peg = DesignCharConstants::DiskStartChar;
 
             for (int i = 0; i < _size - 1; i++) {
                 peg += DesignCharConstants::DiskStructureChar;
